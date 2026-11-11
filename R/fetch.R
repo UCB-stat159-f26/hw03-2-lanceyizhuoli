@@ -1,5 +1,4 @@
 # Private helpers that build Tennis Abstract URLs and download files.
-
 # "serena williams" / "Serena Williams" / "SerenaWilliams" -> "SerenaWilliams"
 format_player_name <- function(player_name) {
   if (!is.character(player_name) || length(player_name) != 1 || is.na(player_name)) {
@@ -10,9 +9,9 @@ format_player_name <- function(player_name) {
   if (length(words) == 0) stop("`player_name` must contain letters.", call. = FALSE)
   paste0(toupper(substr(words, 1, 1)), substring(words, 2), collapse = "")
 }
-
 player_label <- function(player_id) {
-  gsub("([a-z])([A-Z])", "\\1 \\2", player_id)}
+  gsub("([a-z])([A-Z])", "\\1 \\2", player_id)
+}
 
 career_js_url <- function(player_id) {
   sprintf("https://www.tennisabstract.com/jsmatches/%sCareer.js", player_id)
@@ -40,4 +39,20 @@ fetch_career_js <- function(player_id, player_name) {
                  player_name, url), call. = FALSE)
   }
   js_text
+}
+
+extract_dob <- function(text) {
+  hit <- regmatches(text, regexec("dob\\s*=\\s*['\"]?(\\d{8})", text))[[1]]
+  if (length(hit) < 2) return(as.Date(NA))
+  as.Date(hit[2], format = "%Y%m%d")
+}
+
+fetch_player_dob <- function(player_id, js_text, female) {
+  dob <- extract_dob(js_text)
+  if (is.na(dob)) dob <- extract_dob(paste(read_remote(player_page_url(player_id, female)), ""))
+  if (is.na(dob)) {
+    stop(sprintf("Could not find a date of birth for %s on Tennis Abstract.",
+                 player_label(player_id)), call. = FALSE)
+  }
+  dob
 }
