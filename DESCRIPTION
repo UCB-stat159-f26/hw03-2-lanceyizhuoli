@@ -1,0 +1,21 @@
+Package: tennisagegap
+Title: Career Matches and Opponent Age Gaps from Tennis Abstract
+Version: 0.1.0
+Authors@R:
+    person("Lance (YiZhuo)", "Li", role = c("aut", "cre"),
+           email = "lanceli0802@gmail.com")
+Description: Retrieves the career matches of a professional tennis player
+    from Tennis Abstract (<https://www.tennisabstract.com>), cleans them into
+    a data frame of player age, opponent age and match result, and draws a
+    scatter plot in the style of the New York Times graphic of Serena
+    Williams's matches by age.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Imports:
+    ggplot2,
+    jsonlite
+Suggests:
+    testthat (>= 3.1.7)
+Config/testthat/edition: 3
