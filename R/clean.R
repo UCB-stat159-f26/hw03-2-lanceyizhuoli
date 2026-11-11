@@ -1,0 +1,32 @@
+# Position (1-based) of each field inside one match array.
+# Female files: position 17 = opponent's date of birth ("19770119").
+# Male files:   position 17 = opponent's age at the match.
+match_columns <- c(date = 1, tournament = 2, surface = 3, level = 4, result = 5,
+                   round = 9, opponent = 12, opp_birth_or_age = 17)
+
+
+parse_match_array <- function(js_text) {
+  pattern <- "(?s)\\[\\s*\\[.*?\\]\\s*\\]"
+  blocks <- regmatches(js_text, gregexpr(pattern, js_text, perl = TRUE))[[1]]
+  if (length(blocks) == 0) stop("No match array found in the career file.", call. = FALSE)
+  rows <- lapply(blocks, jsonlite::fromJSON, simplifyVector = FALSE)
+  unique(unlist(rows, recursive = FALSE))
+}
+
+field_value <- function(row, i) {
+  if (length(row) < i || is.null(row[[i]])) return(NA_character_)
+  as.character(row[[i]])
+}
+
+rows_to_frame <- function(rows) {
+  cols <- lapply(match_columns, function(i) vapply(rows, field_value, character(1), i = i))
+  as.data.frame(cols, stringsAsFactors = FALSE)
+}
+
+is_birth_date <- function(x) {
+  grepl("^[0-9]{8}$", x)
+}
+
+is_female_file <- function(raw_matches) {
+  any(is_birth_date(raw_matches$opp_birth_or_age))
+}
